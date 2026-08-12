@@ -46,7 +46,9 @@ describe("App", () => {
 
     expect(screen.getByRole("heading", { level: 1, name: "ForkFlow" })).toBeInTheDocument();
     expect(screen.getByText("Revenue (Billed)")).toBeInTheDocument();
-    expect(document.title).toContain("ForkFlow Bistro");
+    await waitFor(() => {
+      expect(document.title).toContain("ForkFlow Bistro");
+    });
   });
 
   it("shows connection error message when API request fails", async () => {
