@@ -1,0 +1,33 @@
+{
+  "settings": {
+    "restaurantName": "ForkFlow Bistro",
+    "serviceCharge": 5,
+    "taxRate": 8
+  },
+  "menu": [
+    { "id": "m1", "name": "Smoked Tomato Soup", "category": "Starter", "price": 8, "stock": 22, "available": true },
+    { "id": "m2", "name": "Truffle Mushroom Pasta", "category": "Main Course", "price": 18, "stock": 14, "available": true },
+    { "id": "m3", "name": "Citrus Herb Chicken", "category": "Main Course", "price": 20, "stock": 17, "available": true },
+    { "id": "m4", "name": "Caramel Panna Cotta", "category": "Dessert", "price": 10, "stock": 11, "available": true },
+    { "id": "m5", "name": "Cold Brew Tonic", "category": "Beverage", "price": 6, "stock": 40, "available": true }
+  ],
+  "tables": [
+    { "id": "t1", "label": "T1", "capacity": 2, "occupied": true },
+    { "id": "t2", "label": "T2", "capacity": 4, "occupied": false },
+    { "id": "t3", "label": "T3", "capacity": 4, "occupied": true },
+    { "id": "t4", "label": "T4", "capacity": 6, "occupied": false },
+    { "id": "t5", "label": "T5", "capacity": 2, "occupied": false },
+    { "id": "t6", "label": "T6", "capacity": 8, "occupied": true }
+  ],
+  "orders": [
+    { "id": "o1001", "customer": "Amelia", "tableId": "t1", "itemId": "m2", "qty": 1, "status": "Preparing", "createdAt": "2026-08-06T12:15:00" },
+    { "id": "o1002", "customer": "Noah", "tableId": "t3", "itemId": "m3", "qty": 2, "status": "Served", "createdAt": "2026-08-06T12:19:00" },
+    { "id": "o1003", "customer": "Emma", "tableId": "t6", "itemId": "m4", "qty": 2, "status": "Pending", "createdAt": "2026-08-06T12:24:00" }
+  ],
+  "customers": [
+    { "name": "Amelia", "visits": 12, "lastVisit": "2026-08-06", "spend": 372 },
+    { "name": "Noah", "visits": 8, "lastVisit": "2026-08-06", "spend": 268 },
+    { "name": "Emma", "visits": 5, "lastVisit": "2026-08-06", "spend": 140 },
+    { "name": "Liam", "visits": 15, "lastVisit": "2026-08-04", "spend": 514 }
+  ]
+}
