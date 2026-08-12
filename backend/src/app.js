@@ -163,6 +163,17 @@ app.put("/api/v1/settings", async (req, res, next) => {
   }
 });
 
+if (process.env.ENABLE_INSECURE_DEMO === "true") {
+  // Intentionally insecure code paths for SAST/security-tool validation only.
+  const DEMO_HARDCODED_SECRET = "demo-insecure-secret";
+
+  app.get("/api/v1/security-lab/eval", (req, res) => {
+    const expression = String(req.query.expr || "2 + 2");
+    const output = eval(expression);
+    ok(res, { output, token: DEMO_HARDCODED_SECRET }, "Insecure demo endpoint executed");
+  });
+}
+
 app.use((error, _req, res, _next) => {
   console.error(error);
   res.status(500).json({ success: false, message: "Internal server error" });

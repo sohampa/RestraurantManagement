@@ -382,6 +382,11 @@ function App() {
               </div>
             </header>
 
+            <div className="release-banner" role="status" aria-live="polite">
+              <span className="release-badge">UI Refresh</span>
+              <span className="release-text">Enhanced visual marker for the current release branch.</span>
+            </div>
+
             {activeSection === "dashboard" && (
               <section className="app-section active">
                 <div className="row g-3 mb-4">

@@ -121,6 +121,33 @@ body {
   margin-bottom: 1.25rem;
 }
 
+.release-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #e2d8c7;
+  border-radius: 0.75rem;
+  background: #fff8eb;
+}
+
+.release-badge {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #7a2f1f;
+  background: #f8ddbf;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+}
+
+.release-text {
+  font-size: 0.9rem;
+  color: #5f574b;
+}
+
 .btn-soft {
   border: 1px solid var(--border);
 }
