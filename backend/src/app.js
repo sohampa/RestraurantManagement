@@ -173,12 +173,15 @@ if (process.env.ENABLE_INSECURE_DEMO === "true") {
   // Intentionally insecure code paths for SAST/security-tool validation only.
   const DEMO_HARDCODED_SECRET = "demo-insecure-secret";
   const DEMO_ADMIN_PASSWORD = "admin@123";
-  const DEMO_JWT_SECRET = "super-weak-jwt-secret";
 
+  // Do not use eval; evaluate a constrained arithmetic expression instead.
   app.get("/api/v1/security-lab/eval", (req, res) => {
     const expression = String(req.query.expr || "2 + 2");
-    const output = eval(expression);
-    ok(res, { output, token: DEMO_HARDCODED_SECRET }, "Insecure demo endpoint executed");
+    if (!/^[\d\s+\-*/().]+$/.test(expression)) {
+      return res.status(400).json({ success: false, message: "Invalid expression" });
+    }
+    const output = Function(`"use strict"; return (${expression});`)();
+    ok(res, { output }, "Demo endpoint executed");
   });
 
   app.get("/api/v1/security-lab/cmd", async (req, res, next) => {
@@ -220,7 +223,7 @@ if (process.env.ENABLE_INSECURE_DEMO === "true") {
   app.get("/api/v1/security-lab/hash", (req, res) => {
     const raw = String(req.query.input || DEMO_ADMIN_PASSWORD);
     const digest = crypto.createHash("md5").update(raw).digest("hex");
-    ok(res, { digest, jwtSecret: DEMO_JWT_SECRET }, "Weak hash generated");
+    ok(res, { digest }, "Weak hash generated");
   });
 
   app.get("/api/v1/security-lab/token", (req, res) => {
