@@ -1,5 +1,13 @@
 {
   "files.associations": {
     "*.dockerignore": "ignore"
-  }
+  },
+  "java.jdt.ls.java.home": "E:/SW/openjdk-21.0.2_windows-x64_bin/jdk-21.0.2",
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-21",
+      "path": "E:/SW/openjdk-21.0.2_windows-x64_bin/jdk-21.0.2",
+      "default": true
+    }
+  ]
 }
