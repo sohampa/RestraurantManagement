@@ -1,7 +1,0 @@
-organization=almcybage
-projectKey=almcybage_restraurantmanagement
-serverUrl=https://sonarcloud.io
-serverVersion=8.0.0.101454
-dashboardUrl=https://sonarcloud.io/dashboard?id=almcybage_restraurantmanagement
-ceTaskId=AZ_6nLReBCYV6Biqavom
-ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZ_6nLReBCYV6Biqavom
