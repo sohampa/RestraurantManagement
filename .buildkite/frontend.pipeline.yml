@@ -1,0 +1,94 @@
+steps:
+  - group: ":react: Frontend Pipeline"
+    key: "frontend-pipeline"
+
+    if_changed:
+      - "frontend/**"
+      - ".buildkite/frontend.pipeline.yml"
+
+    steps:
+      - label: ":test_tube: Frontend Test"
+        key: "frontend-test"
+        command: |
+          set -eu
+
+          echo "--- Installing frontend dependencies"
+          cd frontend
+          npm ci
+
+          echo "--- Running frontend tests"
+          npm test
+        plugins:
+          - docker#v5.14.0:
+              image: "node:24-alpine"
+              propagate-uid-gid: true
+              environment:
+                - "HOME=/tmp"
+                - "NPM_CONFIG_CACHE=/tmp/npm-cache"
+
+      - label: ":hammer: Frontend Build"
+        key: "frontend-build"
+        depends_on:
+          - "frontend-test"
+
+        command: |
+          set -eu
+
+          echo "--- Installing frontend dependencies"
+          cd frontend
+          npm ci
+
+          echo "--- Building frontend"
+          npm run build
+
+          echo "--- Verifying frontend build"
+          test -f dist/index.html
+
+        artifact_paths:
+          - "frontend/dist/**/*"
+
+        plugins:
+          - docker#v5.14.0:
+              image: "node:24-alpine"
+              propagate-uid-gid: true
+              environment:
+                - "HOME=/tmp"
+                - "NPM_CONFIG_CACHE=/tmp/npm-cache"
+
+      - label: ":docker: Frontend Docker Image"
+        key: "frontend-docker"
+        depends_on:
+          - "frontend-build"
+
+        command: |
+          set -eu
+
+          IMAGE_TAG="build-${BUILDKITE_BUILD_NUMBER}-${BUILDKITE_COMMIT:0:12}"
+
+          echo "--- Download frontend build"
+          buildkite-agent artifact download "frontend/dist/**/*" .
+
+          echo "--- Verify build output"
+          test -f frontend/dist/index.html
+
+          echo "--- Build frontend Docker image"
+          docker build \
+            --file frontend/Dockerfile \
+            --tag "forkflow-frontend:${IMAGE_TAG}" \
+            frontend
+
+          echo "--- Verify Docker image"
+          docker image inspect "forkflow-frontend:${IMAGE_TAG}" >/dev/null
+
+          echo "--- Export Docker image"
+          mkdir -p docker-images
+
+          docker save \
+            "forkflow-frontend:${IMAGE_TAG}" \
+            | gzip > "docker-images/forkflow-frontend-${IMAGE_TAG}.tar.gz"
+
+          echo "Frontend Docker image created:"
+          echo "forkflow-frontend:${IMAGE_TAG}"
+
+        artifact_paths:
+          - "docker-images/*.tar.gz"
