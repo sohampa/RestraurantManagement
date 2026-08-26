@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 import App from "./App";
 
@@ -23,6 +23,7 @@ const mockStatePayload = {
     ],
     customers: [
       { name: "Amelia", visits: 12, lastVisit: "2026-08-06", spend: 372 },
+      { name: "Liam", visits: 4, lastVisit: "2026-08-02", spend: 95 },
     ],
   },
 };
@@ -59,5 +60,24 @@ describe("App", () => {
     await waitFor(() => {
       expect(screen.getByText("Unable to connect backend API")).toBeInTheDocument();
     });
+  });
+
+  it("filters customer ledger rows by search text", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => mockStatePayload,
+    });
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 2, name: "Dashboard" })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Customers" }));
+    fireEvent.change(screen.getByLabelText("Search customer"), { target: { value: "amel" } });
+
+    expect(screen.getByText("Amelia")).toBeInTheDocument();
+    expect(screen.queryByText("Liam")).not.toBeInTheDocument();
   });
 });
