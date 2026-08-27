@@ -1,5 +1,4 @@
-name: Claude Code Review
-
+name: Claude Code
 on:
   workflow_dispatch:
   issue_comment:
@@ -9,7 +8,7 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
-  claude-review:
+  claude:
     runs-on: ubuntu-latest
 
     permissions:
@@ -22,8 +21,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Claude Code Review
-        uses: anthropics/claude-code-action@v1
+       
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: anthropics/claude-code-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
