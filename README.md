@@ -1,5 +1,5 @@
 # ForkFlow Restaurant Management (Frontend + Backend)
-
+# ForkFlow Restaurant Management (Frontend + Backend)
 This project is now split into two separate applications:
 
 - frontend: React + Vite user interface
