@@ -239,6 +239,13 @@ body {
   font-size: 1rem;
 }
 
+.customer-filter-bar {
+  padding: 0.75rem;
+  background: #faf6ee;
+  border: 1px solid #eadfcf;
+  border-radius: 0.8rem;
+}
+
 .table-status {
   font-size: 0.8rem;
 }

@@ -75,6 +75,9 @@ function App() {
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [quickOrderOpen, setQuickOrderOpen] = useState(false);
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [customerTierFilter, setCustomerTierFilter] = useState("All");
+  const [customerSort, setCustomerSort] = useState("spend-desc");
 
   const [orderDraft, setOrderDraft] = useState({ customer: "", tableId: "", itemId: "", qty: 1 });
   const [menuDraft, setMenuDraft] = useState({ name: "", category: "Starter", price: "" });
@@ -209,6 +212,26 @@ function App() {
       categorySales,
     };
   }, [state.orders, state.menu, state.settings]);
+
+  const customerRows = useMemo(() => {
+    const searchTerm = customerSearch.trim().toLowerCase();
+
+    return [...state.customers]
+      .filter((customer) => {
+        if (!searchTerm) return true;
+        return customer.name.toLowerCase().includes(searchTerm);
+      })
+      .filter((customer) => {
+        if (customerTierFilter === "All") return true;
+        return getTier(customer.spend) === customerTierFilter;
+      })
+      .sort((left, right) => {
+        if (customerSort === "spend-asc") return left.spend - right.spend;
+        if (customerSort === "visits-desc") return right.visits - left.visits;
+        if (customerSort === "name-asc") return left.name.localeCompare(right.name);
+        return right.spend - left.spend;
+      });
+  }, [state.customers, customerSearch, customerTierFilter, customerSort]);
 
   async function handleCreateOrder(event) {
     event.preventDefault();
@@ -754,6 +777,48 @@ function App() {
                     <h3 className="h6 mb-0">Customer Ledger</h3>
                     <small className="text-secondary">Frequent guests and spend summary</small>
                   </div>
+                  <div className="row g-2 mb-3 customer-filter-bar">
+                    <div className="col-12 col-md-5">
+                      <label className="form-label" htmlFor="customerSearch">Search customer</label>
+                      <input
+                        id="customerSearch"
+                        type="search"
+                        className="form-control"
+                        value={customerSearch}
+                        onChange={(event) => setCustomerSearch(event.target.value)}
+                        placeholder="Type a name"
+                      />
+                    </div>
+                    <div className="col-6 col-md-3">
+                      <label className="form-label" htmlFor="customerTierFilter">Tier</label>
+                      <select
+                        id="customerTierFilter"
+                        className="form-select"
+                        value={customerTierFilter}
+                        onChange={(event) => setCustomerTierFilter(event.target.value)}
+                      >
+                        <option>All</option>
+                        <option>Platinum</option>
+                        <option>Gold</option>
+                        <option>Silver</option>
+                        <option>Bronze</option>
+                      </select>
+                    </div>
+                    <div className="col-6 col-md-4">
+                      <label className="form-label" htmlFor="customerSort">Sort By</label>
+                      <select
+                        id="customerSort"
+                        className="form-select"
+                        value={customerSort}
+                        onChange={(event) => setCustomerSort(event.target.value)}
+                      >
+                        <option value="spend-desc">Spend: High to low</option>
+                        <option value="spend-asc">Spend: Low to high</option>
+                        <option value="visits-desc">Visits: High to low</option>
+                        <option value="name-asc">Name: A to Z</option>
+                      </select>
+                    </div>
+                  </div>
                   <div className="table-responsive">
                     <table className="table">
                       <thead>
@@ -766,7 +831,7 @@ function App() {
                         </tr>
                       </thead>
                       <tbody>
-                        {state.customers.map((customer) => (
+                        {customerRows.map((customer) => (
                           <tr key={customer.name}>
                             <td>{customer.name}</td>
                             <td>{customer.visits}</td>
@@ -775,6 +840,11 @@ function App() {
                             <td>{getTier(customer.spend)}</td>
                           </tr>
                         ))}
+                        {customerRows.length === 0 && (
+                          <tr>
+                            <td colSpan="5" className="text-center text-secondary py-4">No customers match the current filters.</td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>

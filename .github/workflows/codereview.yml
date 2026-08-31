@@ -1,21 +1,25 @@
 name: Claude Code
 on:
+  workflow_dispatch:
   issue_comment:
     types: [created]
-  pull_request_review_comment:
-    types: [created]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
 
-
-permissions:
-  contents: read
-  id-token: write
-  pull-requests: write
-  issues: write
-  
 jobs:
   claude:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      id-token: write
+
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
        
       - name: Checkout repository
@@ -23,5 +27,24 @@ jobs:
 
       - uses: anthropics/claude-code-action@v1
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # Responds to @claude mentions in comments
+
+          prompt: |
+            Review this pull request and always post review feedback.
+
+            Focus on:
+            - Bugs and logical errors
+            - Security vulnerabilities
+            - Code quality
+            - Performance
+            - Error handling
+            - Missing unit tests
+            - Maintainability
+            - CI and workflow reliability
+
+            Requirements for output:
+            - Always leave one PR-level summary comment.
+            - Provide at least 3 concrete, actionable suggestions.
+            - Add inline comments for file-specific issues when possible.
+            - If no blocking issues exist, still provide non-blocking improvements and test suggestions.
