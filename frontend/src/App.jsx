@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { getCustomerInsight } from "./utils/customerInsights";
+import { buildCustomerHealthSummary, getCustomerInsight } from "./utils/customerInsights";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:30000/api/v1";
 const EMPTY_STATE = {
@@ -781,6 +781,7 @@ function App() {
                   <div className="alert alert-light border mb-3" role="status">
                     {getCustomerInsight(state.customers)}
                   </div>
+                  <p className="small text-secondary mb-3">{buildCustomerHealthSummary(state.customers)}</p>
                   <div className="row g-2 mb-3 customer-filter-bar">
                     <div className="col-12 col-md-5">
                       <label className="form-label" htmlFor="customerSearch">Search customer</label>

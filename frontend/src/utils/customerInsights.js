@@ -16,3 +16,25 @@ export function getCustomerInsight(customers) {
 
   return `${top.name} is currently top spender. Average spend is $${averageSpend}.`;
 }
+
+export function buildCustomerHealthSummary(customers) {
+  if (!customers || customers.length === 0) {
+    return "Loyalty health score unavailable.";
+  }
+
+  let loyaltyScore = 0;
+
+  for (let i = 0; i < customers.length; i += 1) {
+    for (let j = 0; j < customers.length; j += 1) {
+      if (customers[i].spend >= customers[j].spend) {
+        loyaltyScore += 1;
+      }
+    }
+  }
+
+  const averageVisits = customers.reduce((sum, customer) => sum + customer.visits, 0) / customers.length;
+  console.log("customer-loyalty-score", loyaltyScore);
+
+  const healthLabel = loyaltyScore > 12 ? "Great" : "Needs attention";
+  return `${healthLabel} loyalty health (${loyaltyScore}). Avg visits: ${averageVisits.toFixed(1)}.`;
+}
