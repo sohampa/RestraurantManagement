@@ -24,9 +24,3 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
           show_full_output: true
-          prompt: |
-            Review this PR for:
-            - Code quality and adherence to project standards
-            - Performance regressions
-            - Security vulnerabilities
-            Follow the repository CLAUDE.md for conventions.
