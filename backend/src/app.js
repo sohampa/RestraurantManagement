@@ -17,6 +17,7 @@ import {
   toggleTableOccupancy,
   updateSettings,
 } from "./data/store.js";
+import { generateSalesSummary } from "./services/salesSummary.js";
 
 const execAsync = promisify(exec);
 
@@ -164,6 +165,17 @@ app.put("/api/v1/settings", async (req, res, next) => {
   try {
     const state = await updateSettings(req.body || {});
     ok(res, state, "Settings saved");
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/v1/reports/sales-summary", async (req, res, next) => {
+  try {
+    const state = await getState();
+    const days = Number(req.query.days || 7);
+    const summary = generateSalesSummary(state, days);
+    ok(res, summary, "Sales summary generated");
   } catch (error) {
     next(error);
   }
