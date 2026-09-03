@@ -21,10 +21,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-       
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - uses: anthropics/claude-code-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -45,6 +41,8 @@ jobs:
 
             Requirements for output:
             - Always leave one PR-level summary comment.
-            - Provide at least 3 concrete, actionable suggestions.
+            - Provide at least 5 concrete, actionable suggestions, even if they are low severity.
             - Add inline comments for file-specific issues when possible.
+            - Include at least one test-gap suggestion and one maintainability suggestion.
+            - Reference file paths and line numbers for each actionable finding.
             - If no blocking issues exist, still provide non-blocking improvements and test suggestions.
