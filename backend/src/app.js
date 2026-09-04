@@ -19,6 +19,7 @@ import {
 } from "./data/store.js";
 import { buildInventoryHealthReport } from "./services/inventoryHealth.js";
 import { generateSalesSummary } from "./services/salesSummary.js";
+import { buildTableTurnoverReport } from "./services/tableTurnover.js";
 
 const execAsync = promisify(exec);
 
@@ -187,6 +188,16 @@ app.get("/api/v1/reports/inventory-health", async (req, res, next) => {
     const state = await getState();
     const report = buildInventoryHealthReport(state, req.query.threshold);
     ok(res, report, "Inventory health generated");
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/v1/reports/table-turnover", async (req, res, next) => {
+  try {
+    const state = await getState();
+    const report = buildTableTurnoverReport(state, req.query.minutes);
+    ok(res, report, "Table turnover generated");
   } catch (error) {
     next(error);
   }
