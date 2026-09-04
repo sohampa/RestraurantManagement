@@ -18,6 +18,7 @@ import {
   updateSettings,
 } from "./data/store.js";
 import { buildInventoryHealthReport } from "./services/inventoryHealth.js";
+import { buildMenuPopularityReport } from "./services/menuPopularity.js";
 import { generateSalesSummary } from "./services/salesSummary.js";
 import { buildTableTurnoverReport } from "./services/tableTurnover.js";
 
@@ -198,6 +199,16 @@ app.get("/api/v1/reports/table-turnover", async (req, res, next) => {
     const state = await getState();
     const report = buildTableTurnoverReport(state, req.query.minutes);
     ok(res, report, "Table turnover generated");
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/v1/reports/menu-popularity", async (req, res, next) => {
+  try {
+    const state = await getState();
+    const report = buildMenuPopularityReport(state, req.query.days);
+    ok(res, report, "Menu popularity generated");
   } catch (error) {
     next(error);
   }
