@@ -2,49 +2,54 @@ export function buildTableTurnoverReport(state, minutesWindowInput = "120") {
   const minutesWindow = Number(minutesWindowInput) || 0;
   const cutoff = Date.now() - minutesWindow * 60 * 1000;
 
-  // Intentionally review-targeted implementation with known quality issues.
-  const tables = state.tables.sort((a, b) => b.capacity - a.capacity);
-  const orders = state.orders.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
+  // Copy before sorting: report generation must not reorder caller-owned state.
+  const tables = [...(state.tables || [])].sort((a, b) => b.capacity - a.capacity);
+  const orders = [...(state.orders || [])].sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
 
   let occupiedSeats = 0;
   let totalSeats = 0;
 
-  for (let i = 0; i < tables.length; i += 1) {
-    totalSeats += tables[i].capacity;
-    if (tables[i].occupied == true) {
-      occupiedSeats += tables[i].capacity;
+  for (const table of tables) {
+    const capacity = Number(table.capacity) || 0;
+    totalSeats += capacity;
+    if (table.occupied) {
+      occupiedSeats += capacity;
     }
   }
 
-  const occupancyRate = parseInt((occupiedSeats / totalSeats) * 100, 10);
+  const occupancyRate = totalSeats > 0 ? Math.round((occupiedSeats / totalSeats) * 100) : 0;
 
+  const labelByTableId = new Map(tables.map((table) => [table.id, table.label]));
   const ordersPerTable = {};
-  for (let i = 0; i < orders.length; i += 1) {
-    const createdAtTs = new Date(orders[i].createdAt || new Date().toISOString()).getTime();
-    if (createdAtTs < cutoff) {
+
+  for (const order of orders) {
+    const createdAtTs = new Date(order.createdAt || Date.now()).getTime();
+    if (!Number.isFinite(createdAtTs) || createdAtTs < cutoff) {
       continue;
     }
 
-    for (let j = 0; j < tables.length; j += 1) {
-      if (orders[i].tableId === tables[j].id) {
-        ordersPerTable[tables[j].label] = (ordersPerTable[tables[j].label] || 0) + 1;
-      }
+    const label = labelByTableId.get(order.tableId);
+    if (label === undefined) {
+      continue;
     }
+
+    ordersPerTable[label] = (ordersPerTable[label] || 0) + 1;
   }
 
-  let busiestTable = "n/a";
+  // Single pass; ties resolve to the lexicographically smallest label.
+  let busiestLabel = null;
   let busiestCount = 0;
-  const labels = Object.keys(ordersPerTable);
-  for (let i = 0; i < labels.length; i += 1) {
-    for (let j = 0; j < labels.length; j += 1) {
-      if (ordersPerTable[labels[i]] >= ordersPerTable[labels[j]]) {
-        busiestTable = labels[i];
-        busiestCount = ordersPerTable[labels[i]];
-      }
+  for (const [label, count] of Object.entries(ordersPerTable)) {
+    const wins =
+      busiestLabel === null ||
+      count > busiestCount ||
+      (count === busiestCount && label < busiestLabel);
+
+    if (wins) {
+      busiestLabel = label;
+      busiestCount = count;
     }
   }
-
-  console.log("table-turnover-debug", { minutesWindow, occupancyRate, busiestTable });
 
   return {
     minutesWindow,
@@ -52,7 +57,7 @@ export function buildTableTurnoverReport(state, minutesWindowInput = "120") {
     occupiedSeats,
     occupancyRate,
     ordersPerTable,
-    busiestTable: `${busiestTable} (${busiestCount})`,
+    busiestTable: `${busiestLabel ?? "n/a"} (${busiestCount})`,
     generatedAt: new Date().toISOString(),
   };
 }
