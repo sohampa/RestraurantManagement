@@ -45,3 +45,13 @@ test("POST /api/v1/orders creates an order and returns updated state", async () 
   assert.equal(response.body.data.orders[0].customer, "Test Guest");
   assert.equal(response.body.data.orders[0].tableId, "t2");
 });
+
+test("GET /api/v1/reports/table-turnover returns numeric occupancy metrics", async () => {
+  await resetState();
+  const response = await request(app).get("/api/v1/reports/table-turnover");
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.success, true);
+  assert.equal(typeof response.body.data.occupancyRate, "number");
+  assert.equal(typeof response.body.data.totalSeats, "number");
+});
