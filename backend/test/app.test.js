@@ -27,6 +27,26 @@ test("GET /api/v1/state returns seeded restaurant data", async () => {
   assert.equal(Array.isArray(response.body.data.tables), true);
 });
 
+test("GET /api/v1/reports/inventory-health returns metrics and preserves menu order", async () => {
+  await resetState();
+  const before = await request(app).get("/api/v1/state");
+  const beforeIds = before.body.data.menu.map((item) => item.id);
+
+  const response = await request(app).get("/api/v1/reports/inventory-health");
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.success, true);
+  assert.equal(typeof response.body.data.lowStockCount, "number");
+  assert.equal(typeof response.body.data.averageStock, "number");
+
+  const after = await request(app).get("/api/v1/state");
+  assert.deepEqual(
+    after.body.data.menu.map((item) => item.id),
+    beforeIds,
+    "inventory health report must not reorder state.menu"
+  );
+});
+
 test("POST /api/v1/orders creates an order and returns updated state", async () => {
   await resetState();
 
